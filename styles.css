@@ -1,0 +1,38 @@
+tr.attheader {
+  text-align: center;
+}
+
+img.file-pdf {
+  max-height: 25px;
+  cursor: pointer;
+}
+
+section.block.block_academic_reports.card.mb-3 {
+  width: 46.2%;
+  position: absolute;
+  left: 49.5%;
+  margin-left: 2%;
+  /* margin-top: 13.5%;
+  top: 22%; */
+}
+
+.my-custom-scrollbar {
+  position: relative;
+  height: 185px;
+  overflow: auto;
+}
+.table-wrapper-scroll-y {
+  display: block;
+}
+
+@media only screen and (max-width: 1024px) {
+ 
+    section.block.block_academic_reports.card.mb-3 {
+      width: 100%;
+      position: relative;
+      margin-left: 0;
+      left: 0;
+      top: 0!important;
+    }
+  }
+  
