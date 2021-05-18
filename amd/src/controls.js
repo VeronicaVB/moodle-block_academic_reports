@@ -49,6 +49,7 @@
 
          let self = this;
          self.setupEvents();
+         
          self.setPosition();
 
          // Subscribe to nav drawer event and resize when it completes.
@@ -71,11 +72,16 @@
              return;
          }
 
-         $('section.block.block_academic_reports.card.mb-3').css('top', () => {
+         $('section.block.block_academic_reports.card.mb-3').css('top', () => { 
              const hge = $('.block_grades_effort_report').outerHeight(true);
              const topge = $('.block_grades_effort_report').position();
-             let artop = hge + topge.top;
+             let extraspace = 0;
+             if (!$('#performance').data('performance')) {
+                extraspace = 10;
+             }
+             let artop = hge + topge.top + extraspace;
              const value = artop.toString() + 'px';
+             console.log('TOP: ' + value);
              return value;
          });
 
