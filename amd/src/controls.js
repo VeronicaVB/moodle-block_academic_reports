@@ -21,11 +21,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- define(['jquery', 'core/ajax', 'core/log', 'core/pubsub'], function ($, Ajax, Log, PubSub) {
-    'use strict';
+ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub'], 
+ function ($, Ajax, Log, PubSub) {
+    'use strict'; 
 
     function init() {
-
         var control = new Controls();
         control.main();
     }
@@ -38,7 +38,7 @@
     function Controls() {
         Log.debug('block_academic_reports: initializing controls');
         let self = this;
-
+        
     }
 
     /**
@@ -49,7 +49,6 @@
 
          let self = this;
          self.setupEvents();
-         
          self.setPosition();
 
          // Subscribe to nav drawer event and resize when it completes.
@@ -84,11 +83,7 @@
              console.log('TOP: ' + value);
              return value;
          });
-
-         
-
-
-     }
+    }
 
     Controls.prototype.setupEvents = function () {
         let self = this;

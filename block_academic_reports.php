@@ -112,6 +112,5 @@ class block_academic_reports extends block_base
         return true;
     }
 
-    
 
 }
