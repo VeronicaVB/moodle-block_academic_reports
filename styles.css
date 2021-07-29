@@ -12,7 +12,7 @@ section.block.block_academic_reports.card.mb-3 {
     position: absolute;
     left: 49.5%;
     margin-left: 2%;
-    height: 20rem;
+    height: 24rem;
 }
 
 .my-custom-scrollbar {
@@ -23,7 +23,7 @@ section.block.block_academic_reports.card.mb-3 {
 
 .table-wrapper-scroll-y {
     display: inline-block;
-    /* height: 16.4rem; */
+    height: 17rem;
 }
 
 @media only screen and (max-width: 1024px) {

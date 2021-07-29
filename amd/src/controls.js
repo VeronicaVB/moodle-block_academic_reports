@@ -55,9 +55,11 @@
          PubSub.subscribe('nav-drawer-toggle-end', function (el) {
              Log.debug('resizing block_academic_reports');
              if ($("#nav-drawer").hasClass("closed")) {
-                $('table.table.table-striped.table-wrapper-scroll-y.my-custom-scrollbar').css('height', '140px');
+                $('table.table.table-striped.table-wrapper-scroll-y.my-custom-scrollbar').css('height', '13rem ');
+                $('section.block.block_academic_reports.card.mb-3').css('height', '20rem');
              } else {
-                $('table.table.table-striped.table-wrapper-scroll-y.my-custom-scrollbar').css('height', '185px');
+                $('table.table.table-striped.table-wrapper-scroll-y.my-custom-scrollbar').css('height', '18rem ');
+                $('section.block.block_academic_reports.card.mb-3').css('height', '24rem');
              }
          });
 
