@@ -26,8 +26,7 @@ namespace academic_reports;
 
 
 // Parent view of own child's activity functionality
-function can_view_on_profile()
-{
+function can_view_on_profile() {
     global $DB, $USER, $PAGE;
 
     $config = get_config('block_academic_reports');
@@ -46,11 +45,10 @@ function can_view_on_profile()
         }
 
         // Parents are allowed to view block in their mentee profiles.
-       
+
         if (!empty(get_mentor($profileuser))) {
             return true;
         }
-       
     }
 
     return false;
@@ -61,7 +59,7 @@ function get_mentor($profileuser) {
     // Parents are allowed to view block in their mentee profiles.
     $mentorrole = $DB->get_record('role', array('shortname' => 'parent'));
     $mentor = null;
-   
+
     if ($mentorrole) {
 
         $sql = "SELECT ra.*, r.name, r.shortname
@@ -82,7 +80,6 @@ function get_mentor($profileuser) {
         );
 
         $mentor = $DB->get_records_sql($sql, $params);
-      
     }
 
     return $mentor;
@@ -93,11 +90,12 @@ function get_mentor($profileuser) {
  * @return string
  */
 
-function get_template_context($studentusername, $mentorusername)
-{  global $CFG;
+function get_template_context($studentusername, $mentorusername) {
+    global $CFG;
     $reports = get_student_reports($studentusername, $mentorusername);
-    $data = null;
     
+    $data = null;
+
     foreach ($reports as $report) {
         $repo = new \stdClass();
         $repo->description = $report->description;
@@ -115,11 +113,10 @@ function get_template_context($studentusername, $mentorusername)
 /**
  * Call to the SP 
  */
-function get_student_reports($studentusername, $mentorusername)
-{
-
+function get_student_reports($studentusername, $mentorusername) {
+    $docreports = [];
     try {
-       
+
         $config = get_config('block_academic_reports');
 
         // Last parameter (external = true) means we are not connecting to a Moodle database.
@@ -135,12 +132,11 @@ function get_student_reports($studentusername, $mentorusername)
         );
 
         $docreports = $externalDB->get_records_sql($sql, $params);
-
-        return $docreports;
-
+      
     } catch (\Exception $ex) {
-           //var_dump($ex);
     }
+
+    return $docreports;
 }
 
 function get_student_report_file($tdocumentsseq) {
@@ -150,12 +146,11 @@ function get_student_report_file($tdocumentsseq) {
     // Connect to external DB.
     $externalDB->connect($config->dbhost, $config->dbuser, $config->dbpass, $config->dbname, '');
 
-    $sql = 'EXEC ' . $config->dbspsretrievestdreport .':tdocumentsseq';
+    $sql = 'EXEC ' . $config->dbspsretrievestdreport . ':tdocumentsseq';
     $params = array('tdocumentsseq' => intval($tdocumentsseq));
 
     $documents = $externalDB->get_records_sql($sql, $params);
     $document = reset($documents);
-   
-    return $document->document;
 
+    return $document->document;
 }
