@@ -26,10 +26,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/externallib.php');
 
-use external_api;
+use core_external\external_api;
 
 class api extends external_api {
 
     use get_student_report;
+    use get_student_reports;
     
 }

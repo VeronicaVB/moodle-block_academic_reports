@@ -1,19 +1,21 @@
 tr.attheader {
-   text-align: center;
+    text-align: center;
 }
 
-img.file-pdf {
-    max-height: 25px;
+.ar-file-pdf {
+    /* max-height: 25px; */
     cursor: pointer;
+    font-size: 25px
 }
 
 section.block.block_academic_reports.card.mb-3 {
-    width: 46.2%;
-    position: absolute;
-    left: 49.5%;
-    margin-left: 2%;
+    /* width: 46.2%; */
+    position: relative;
+    /* left: 49.5%; */
+    /* margin-left: 2%; */
     height: 24rem;
 }
+
 
 .my-custom-scrollbar {
     position: relative;
@@ -24,6 +26,16 @@ section.block.block_academic_reports.card.mb-3 {
 .table-wrapper-scroll-y {
     display: inline-block;
     height: 17rem;
+}
+
+
+.spinner-border.text-primary.ac-reports-working {
+    height: 1rem;
+    width: 1rem;
+}
+
+.ar-download-report-container {
+    margin-left: 36rem;
 }
 
 @media only screen and (max-width: 1024px) {

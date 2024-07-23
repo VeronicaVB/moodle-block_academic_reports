@@ -28,13 +28,11 @@ require_once($CFG->dirroot . '/blocks/academic_reports/lib.php');
 class block_academic_reports extends block_base
 {
 
-    public function init()
-    {
+    public function init() {
         $this->title = get_string('pluginname', 'block_academic_reports');
     }
 
-    public function get_content()
-    {
+    public function get_content() {
         global  $OUTPUT, $PAGE, $DB, $USER;
 
         if ($this->content !== null) {
@@ -62,7 +60,7 @@ class block_academic_reports extends block_base
       
         $this->content = new stdClass;
         $this->content->footer = '';
-
+   
         if (academic_reports\can_view_on_profile()) {
 
             $data = '';
@@ -85,7 +83,7 @@ class block_academic_reports extends block_base
                 $data = academic_reports\get_template_context($profileuser->username, $USER->username);
             }
             
-            empty($data) ? $this->content->text = '' : $this->content->text = $OUTPUT->render_from_template('block_academic_reports/main', $data);
+            empty($data) ? $this->content->text = 'empty' : $this->content->text = $OUTPUT->render_from_template('block_academic_reports/main', $data);
         }
 
        

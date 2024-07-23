@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>amd/src/jszip.js</location>
+        <name>PDF-LIB</name>
+        <version>1.17.0</version>
+        <license>Apache</license>
+        <licenseversion>2.0</licenseversion>
+    </library>
+    
+</libraries>

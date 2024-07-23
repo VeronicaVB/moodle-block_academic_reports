@@ -19,7 +19,7 @@
  *
  * @package   block_academic_report
  * @category    external
- * @copyright 2020 Veronica Bermegui, Canberra Grammar School <veronica.bermegui@cgs.act.edu.au>
+ * @copyright 2020 Veronica Bermegui
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,6 +30,15 @@ $functions = [
         'classname' => 'block_academic_reports\external\api', // Class containing a reference to the external function.
         'methodname' => 'get_student_report', // External function name.
         'description' => 'Get report file', // Human readable description of the WS function.
+        'type' => 'read', // DB rights of the WS function.
+        'loginrequired' => true,
+        'ajax' => true    // Is this service available to 'internal' ajax calls.
+    ],
+
+    'block_academic_reports_get_student_reports' => [
+        'classname' => 'block_academic_reports\external\api', // Class containing a reference to the external function.
+        'methodname' => 'get_student_reports', // External function name.
+        'description' => 'Get all the reports files of the student', // Human readable description of the WS function.
         'type' => 'read', // DB rights of the WS function.
         'loginrequired' => true,
         'ajax' => true    // Is this service available to 'internal' ajax calls.

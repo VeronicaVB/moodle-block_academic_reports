@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *   Web service to get reports the student has
+ *  Web service to get reports the student has
  *
  * @package   academic_reports
  * @category
- * @copyright 2021 Veronica Bermegui
+ * @copyright 2024 Veronica Bermegui
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,9 +35,9 @@ require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/blocks/academic_reports/lib.php');
 
 /**
- * Trait implementing the external function block_grades_effort_report
+ * Trait implementing the external function block_academic_reports
  */
-trait get_student_report {
+trait get_student_reports {
 
 
     /**
@@ -45,10 +45,10 @@ trait get_student_report {
      * @return external_function_parameters
      */
 
-    public static  function get_student_report_parameters()    {
+    public static  function get_student_reports_parameters()    {
         return new external_function_parameters(
             array(
-                'tdocumentsseq' => new external_value(PARAM_RAW, 'file id to get'),               
+                'sequences' => new external_value(PARAM_RAW, 'file ids to get'),               
             )
         );
     }
@@ -56,20 +56,20 @@ trait get_student_report {
     /**
      * Return context.
      */
-    public static function get_student_report($tdocumentsseq) {
+    public static function get_student_reports($sequences) {
         global $USER, $PAGE;
         
         $context = \context_user::instance($USER->id);
        
         self::validate_context($context);
         //Parameters validation
-        self::validate_parameters(self::get_student_report_parameters(), array('tdocumentsseq' => $tdocumentsseq));
+        self::validate_parameters(self::get_student_reports_parameters(), array('sequences' => $sequences));
         
-        // Get the context for the template.
-        $blob = \academic_reports\get_student_report_file($tdocumentsseq);
+       
+        $blobs = \academic_reports\get_student_reports_files($sequences);
       
         return array(
-            'blob' => json_encode(base64_encode($blob), JSON_UNESCAPED_UNICODE),
+            'blobs' => json_encode($blobs) //json_encode(base64_encode($blobs), JSON_UNESCAPED_UNICODE),
         );
     }
 
@@ -77,10 +77,10 @@ trait get_student_report {
      * Describes the structure of the function return value.
      * @return external_single_structures
      */
-    public static function get_student_report_returns()
+    public static function get_student_reports_returns()
     {
         return new external_single_structure(array(
-            'blob' =>  new external_value(PARAM_RAW, 'Blob representation of the file'),
+            'blobs' =>  new external_value(PARAM_RAW, 'A JSON object with all the blob that represents each report the student'),
         ));
     }
 }

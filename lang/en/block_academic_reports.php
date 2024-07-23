@@ -40,6 +40,8 @@ $string['dbspstudentreportdocs'] = 'Student report docs';
 $string['dbspstudentreportdocs_desc'] = 'Stored procedure name to retrieve students reports';
 $string['dbspsretrievestdreport'] = 'Retrieve Student Report';
 $string['dbspsretrievestdreport_desc'] = 'Stored procedure name to retrieve report document information.';
+$string['dbspsretrievestdreports'] = 'Retrieve  all Student\'s Reports';
+$string['dbspsretrievestdreports_desc'] = 'Stored procedure name to retrieve all the reports the studen has available.';
 $string['profileurl'] = 'Profile URL';
 $string['profileurl_desc'] =' Moodle\'s profile URL';
 

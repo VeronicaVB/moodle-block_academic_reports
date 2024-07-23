@@ -22,6 +22,11 @@ along with Moodle. If not, see
 }}
 
 <section id="ac-reports" class="academic-reports-section">
+    <div class = 'ar-download-report-container'>
+        <span><a href="#"  class = 'ar-download-all'>Download reports</a>
+        <div class="spinner-border text-primary ac-reports-working" hidden role="status"></div>
+    </div>
+    
     <div class="card-body">
         <h3 class="lead">{{#str}} pluginname, block_academic_reports {{/str}}</h3>
         <div class="container-fluid">
@@ -44,7 +49,7 @@ along with Moodle. If not, see
                                         <tr >
                                             <td class="view-report">{{description}}</td>
                                             <td class="text-center view-report"> 
-                                                <img data-tdss="{{tdocumentsseq}}" class ="file-pdf" src="{{icon}}" alt="view report">
+                                                <i data-tdss="{{tdocumentsseq}}"  class="fa fa-file-pdf-o ar-file-pdf" ></i>
                                             </td>
                                             <td>{{documentcreateddate}}</td>
                                         </tr>

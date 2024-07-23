@@ -27,35 +27,58 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
 
-    $settings->add(new admin_setting_heading(
-        'block_academic_reports',
-        '',
-        get_string('pluginname_desc', 'block_academic_reports')
-    ));
+    $settings->add(new admin_setting_heading('block_academic_reports',
+                                                '',
+                                                get_string('pluginname_desc', 'block_academic_reports')
+                                            ));
 
     $options = array('', "mysqli", "oci", "pdo", "pgsql", "sqlite3", "sqlsrv");
     $options = array_combine($options, $options);
 
-    $settings->add(new admin_setting_configselect(
-        'block_academic_reports/dbtype',
-        get_string('dbtype', 'block_academic_reports'),
-        get_string('dbtype_desc', 'block_academic_reports'),
-        '',
-        $options
+    $settings->add(new admin_setting_configselect( 'block_academic_reports/dbtype',
+                                                    get_string('dbtype', 'block_academic_reports'),
+                                                    get_string('dbtype_desc', 'block_academic_reports'),
+                                                    '',
+                                                    $options
     ));
 
-    $settings->add(new admin_setting_configtext('block_academic_reports/dbhost', get_string('dbhost', 'block_academic_reports'), get_string('dbhost_desc', 'block_academic_reports'), 'localhost'));
+    $settings->add(new admin_setting_configtext('block_academic_reports/dbhost', 
+                                                get_string('dbhost', 'block_academic_reports'), 
+                                                get_string('dbhost_desc', 'block_academic_reports'), 'localhost'));
 
-    $settings->add(new admin_setting_configtext('block_academic_reports/dbuser', get_string('dbuser', 'block_academic_reports'), '', ''));
+    $settings->add(new admin_setting_configtext('block_academic_reports/dbuser', 
+                                                get_string('dbuser', 'block_academic_reports'), 
+                                                '', 
+                                                ''));
 
-    $settings->add(new admin_setting_configpasswordunmask('block_academic_reports/dbpass', get_string('dbpass', 'block_academic_reports'), '', ''));
+    $settings->add(new admin_setting_configpasswordunmask('block_academic_reports/dbpass', 
+                                                            get_string('dbpass', 'block_academic_reports'), 
+                                                            '', 
+                                                            ''));
 
-    $settings->add(new admin_setting_configtext('block_academic_reports/dbname', get_string('dbname', 'block_academic_reports'), '', ''));
+    $settings->add(new admin_setting_configtext('block_academic_reports/dbname', 
+                                                get_string('dbname', 'block_academic_reports'), 
+                                                '', 
+                                                ''));
 
-    $settings->add(new admin_setting_configtext('block_academic_reports/dbspstudentreportdocs', get_string('dbspstudentreportdocs', 'block_academic_reports'), get_string('dbspstudentreportdocs_desc', 'block_academic_reports'), ''));
+    $settings->add(new admin_setting_configtext('block_academic_reports/dbspstudentreportdocs', 
+                                                get_string('dbspstudentreportdocs', 'block_academic_reports'), 
+                                                get_string('dbspstudentreportdocs_desc', 'block_academic_reports'), 
+                                                ''));
     
-    $settings->add(new admin_setting_configtext('block_academic_reports/dbspsretrievestdreport', get_string('dbspsretrievestdreport', 'block_academic_reports'), get_string('dbspsretrievestdreport_desc', 'block_academic_reports'), ''));
+    $settings->add(new admin_setting_configtext('block_academic_reports/dbspsretrievestdreport', 
+                                                get_string('dbspsretrievestdreport', 'block_academic_reports'), 
+                                                get_string('dbspsretrievestdreport_desc', 'block_academic_reports'), 
+                                                ''));
 
-    $settings->add(new admin_setting_configtext('block_academic_reports/profileurl', get_string('profileurl', 'block_academic_reports'), get_string('profileurl_desc', 'block_attendance_report'), ''));
+     $settings->add(new admin_setting_configtext('block_academic_reports/dbspsretrievestdreports', 
+                                                get_string('dbspsretrievestdreports', 'block_academic_reports'), 
+                                                get_string('dbspsretrievestdreports_desc', 'block_academic_reports'), 
+                                                ''));
+                                           
+    $settings->add(new admin_setting_configtext('block_academic_reports/profileurl', 
+                                                    get_string('profileurl', 'block_academic_reports'), 
+                                                    get_string('profileurl_desc', 'block_academic_reports'), 
+                                                    ''));
 
 }
