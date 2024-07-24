@@ -92,6 +92,8 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
                 sequences = sequences.join(',')
                 sequences = `[${sequences}]`
                 self.getAllReportService(sequences)
+                event.preventDefault();
+
             });
 
 
