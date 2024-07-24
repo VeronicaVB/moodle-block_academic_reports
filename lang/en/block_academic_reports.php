@@ -49,5 +49,5 @@ $string['nodbsettings'] = 'Please configure the DB options for the plugin';
 $string['description'] = 'Description';
 $string['createddate'] = 'Created date';
 $string['viewreport'] = 'View';
-
+$string['generatingfile'] = 'Generating compressed file';
 

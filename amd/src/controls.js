@@ -87,7 +87,7 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
                 });
 
                 // Add animation to let the user know that something is happening
-                (document.getElementsByClassName('ac-reports-working')[0]).removeAttribute('hidden')
+                (document.getElementsByClassName('ar-downloading')[0]).removeAttribute('hidden')
 
                 sequences = sequences.join(',')
                 sequences = `[${sequences}]`
@@ -174,7 +174,7 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
             });
 
             // Remove animation animation to let the user know that something is happening
-            (document.getElementsByClassName('ac-reports-working')[0]).setAttribute('hidden', true)
+            (document.getElementsByClassName('ar-downloading')[0]).setAttribute('hidden', true)
 
         }
 
