@@ -21,13 +21,17 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/ajax', 'core/log', 'core/pubsub', 'block_academic_reports/jszip'],
-    function ($, Ajax, Log, PubSub, JSZip) {
+define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
+    'block_academic_reports/jszip',
+    'block_academic_reports/FileSaver'],
+    function ($, Ajax, Log, PubSub, JSZip, FileSaver) {
         'use strict';
-
+        // FileSaver is loaded and attached to the window object. It needs to be added in the arguments list but 
+        // has to be accessed from the windows object
         function init() {
             var control = new Controls();
             control.main();
+
         }
 
         /**
@@ -128,8 +132,6 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub', 'block_academic_report
                     const r = JSON.parse(response.blobs);
                     // Convert the object into an array
                     const filesData = Object.values(r);
-
-                    console.log(filesData)
                     self.generateZipToDownload(filesData);
 
                 },
@@ -163,17 +165,13 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub', 'block_academic_report
 
             }
 
-            const zipData = await zip.generateAsync({
+            // Generates the zip file and open the save as window (in Chrome), downloads directly on Edge
+            await zip.generateAsync({
                 type: "blob",
                 streamFiles: true
-            })
-
-            window.URL.createObjectURL(zipData)
-
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(zipData);
-            link.download = `reports.zip`
-            link.click();
+            }).then(function (content) {
+                window.saveAs(content, "cgsStudentReports.zip");
+            });
 
             // Remove animation animation to let the user know that something is happening
             (document.getElementsByClassName('ac-reports-working')[0]).setAttribute('hidden', true)

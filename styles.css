@@ -38,6 +38,10 @@ section.block.block_academic_reports.card.mb-3 {
     margin-left: 36rem;
 }
 
+.ar-title {
+    font-weight: bold;
+}
+
 @media only screen and (max-width: 1024px) {
 
     section.block.block_academic_reports.card.mb-3 {

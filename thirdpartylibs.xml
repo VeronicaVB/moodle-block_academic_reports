@@ -2,10 +2,15 @@
 <libraries>
     <library>
         <location>amd/src/jszip.js</location>
-        <name>PDF-LIB</name>
-        <version>1.17.0</version>
-        <license>Apache</license>
-        <licenseversion>2.0</licenseversion>
+        <name>jszip</name>
+        <version>3.10.1</version>
+        <license>GPLv3</license>
+    </library>
+    <library>
+        <location>amd/src/FileSaver.js</location>
+        <name>FileSaver</name>
+        <version>2.0.4</version>
+        <license>The MIT License</license>
     </library>
     
 </libraries>
