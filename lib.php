@@ -30,24 +30,29 @@ function can_view_on_profile() {
     global $DB, $USER, $PAGE;
 
     $config = get_config('block_academic_reports');
-  
+   
     if ($PAGE->url->get_path() ==  $config->profileurl) {
-        // Admin is allowed.
         $profileuser = $DB->get_record('user', ['id' => $PAGE->url->get_param('id')]);
-
-        if (is_siteadmin($USER) && $profileuser->username != $USER->username) {
-            return true;
-        }
-
-        // Students are allowed to see block in their own profiles.
-        if ($profileuser->username == $USER->username && !is_siteadmin($USER)) {
-            return true;
-        }
-
-        // Parents are allowed to view block in their mentee profiles.
-
-        if (!empty(get_mentor($profileuser))) {
-            return true;
+        profile_load_custom_fields($profileuser);
+        
+        // Only show block in seniors profiles
+        if ( $profileuser->profile['CampusRoles'] == 'Senior School:Students') {
+            
+            // Admin is allowed.
+            if (is_siteadmin($USER) && $profileuser->username != $USER->username) {
+                return true;
+            }
+    
+            // Students are allowed to see block in their own profiles.
+            if ($profileuser->username == $USER->username && !is_siteadmin($USER)) {
+                return true;
+            }
+    
+            // Parents are allowed to view block in their mentee profiles.
+    
+            if (!empty(get_mentor($profileuser))) {
+                return true;
+            }
         }
     }
 

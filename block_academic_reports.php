@@ -48,7 +48,10 @@ class block_academic_reports extends block_base
             empty($config->dbuser) ||
             empty($config->dbpass) ||
             empty($config->dbname) ||
-            empty($config->dbspstudentreportdocs) 
+            empty($config->dbspstudentreportdocs)  ||
+            empty($config->dbspsretrievestdreport) || 
+            empty($config->dbspsretrievestdreports)  
+
         ) {
             $notification = new \core\output\notification(
                 get_string('nodbsettings', 'block_academic_reports'),
@@ -57,7 +60,8 @@ class block_academic_reports extends block_base
             $notification->set_show_closebutton(false);
             return $OUTPUT->render($notification);
         }
-      
+
+
         $this->content = new stdClass;
         $this->content->footer = '';
    
