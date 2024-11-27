@@ -49,8 +49,8 @@ class block_academic_reports extends block_base
             empty($config->dbpass) ||
             empty($config->dbname) ||
             empty($config->dbspstudentreportdocs)  ||
-            empty($config->dbspsretrievestdreport) || 
-            empty($config->dbspsretrievestdreports)  
+            empty($config->dbspsretrievestdreport) ||
+            empty($config->dbspsretrievestdreports)
 
         ) {
             $notification = new \core\output\notification(
@@ -64,7 +64,7 @@ class block_academic_reports extends block_base
 
         $this->content = new stdClass;
         $this->content->footer = '';
-   
+
         if (academic_reports\can_view_on_profile()) {
 
             $data = '';
@@ -74,8 +74,13 @@ class block_academic_reports extends block_base
             if ($profileuser->username == $USER->username && !is_siteadmin($USER)) {
                 $data = academic_reports\get_template_context($profileuser->username, $profileuser->username);
             }
-            // Allow admins to see the reports to test. 
+            // Allow admins to see the reports to test.
             if ($profileuser->username != $USER->username && is_siteadmin($USER)) {
+                $data = academic_reports\get_template_context($profileuser->username, $profileuser->username);
+            }
+
+            // Allow teachers to see the reports
+            if (preg_match('/\b(Staff|staff)\b/', $USER->profile['CampusRoles']) == 1 && $profileuser->username != $USER->username) {
                 $data = academic_reports\get_template_context($profileuser->username, $profileuser->username);
             }
 
@@ -83,14 +88,14 @@ class block_academic_reports extends block_base
 
             // Mentors are allowed to see their mentees reports.
             if (!empty($mentor)){
-              
+
                 $data = academic_reports\get_template_context($profileuser->username, $USER->username);
             }
-            
+
             empty($data) ? $this->content->text = 'empty' : $this->content->text = $OUTPUT->render_from_template('block_academic_reports/main', $data);
         }
 
-       
+
         return $this->content;
     }
 
