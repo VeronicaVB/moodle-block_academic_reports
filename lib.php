@@ -30,29 +30,37 @@ function can_view_on_profile() {
     global $DB, $USER, $PAGE;
 
     $config = get_config('block_academic_reports');
-   
-    if ($PAGE->url->get_path() ==  $config->profileurl) {
+
+    if ($PAGE->url->get_path() == $config->profileurl) {
         $profileuser = $DB->get_record('user', ['id' => $PAGE->url->get_param('id')]);
         profile_load_custom_fields($profileuser);
-        
+        $campusrole = $USER->profile['CampusRoles'];
+
         // Only show block in seniors profiles
         if ( $profileuser->profile['CampusRoles'] == 'Senior School:Students') {
-            
+
             // Admin is allowed.
             if (is_siteadmin($USER) && $profileuser->username != $USER->username) {
                 return true;
             }
-    
+            // Staff allowed
+            if (preg_match('/\b(Staff|staff)\b/', $campusrole) == 1 && $profileuser->username != $USER->username) {
+                return true;
+            }
+
             // Students are allowed to see block in their own profiles.
             if ($profileuser->username == $USER->username && !is_siteadmin($USER)) {
                 return true;
             }
-    
+
             // Parents are allowed to view block in their mentee profiles.
-    
+
             if (!empty(get_mentor($profileuser))) {
                 return true;
+
             }
+
+            // Allow teachers to see.
         }
     }
 
@@ -115,12 +123,12 @@ function get_template_context($studentusername, $mentorusername) {
 
 
 /**
- * Call to the SP 
+ * Call to the SP
  */
 function get_student_reports($studentusername, $mentorusername) {
-    
+
     $docreports = [];
-    
+
     try {
 
         $config = get_config('block_academic_reports');
@@ -138,7 +146,7 @@ function get_student_reports($studentusername, $mentorusername) {
         );
 
         $docreports = $externalDB->get_records_sql($sql, $params);
-      
+
     } catch (\Exception $ex) {
     }
 
@@ -150,7 +158,7 @@ function get_student_reports($studentusername, $mentorusername) {
  */
 
 function get_student_report_file($tdocumentsseq) {
-    
+
     $config = get_config('block_academic_reports');
     // Last parameter (external = true) means we are not connecting to a Moodle database.
     $externalDB = \moodle_database::get_driver_instance($config->dbtype, 'native', true);
@@ -159,7 +167,7 @@ function get_student_report_file($tdocumentsseq) {
 
     $sql = 'EXEC ' . $config->dbspsretrievestdreport . ' :tdocumentsseq';
     $params = array('tdocumentsseq' => intval($tdocumentsseq));
-   
+
 
     $documents = $externalDB->get_records_sql($sql, $params);
     $document = reset($documents);
@@ -179,7 +187,7 @@ function get_student_reports_files($tDocumentsSequences) {
     $externalDB->connect($config->dbhost, $config->dbuser, $config->dbpass, $config->dbname, '');
 
     $sql = 'EXEC ' . $config->dbspsretrievestdreports . ' :sequences';
-   
+
     $params = array('sequences' => strval($tDocumentsSequences));
 
     $documents = $externalDB->get_records_sql($sql, $params);
