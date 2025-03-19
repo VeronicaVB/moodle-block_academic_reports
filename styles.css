@@ -60,3 +60,33 @@ section.block.block_academic_reports.card.mb-3 {
         top: 0 !important;
     }
 }
+
+/* Media query for screens with a width of 600px or less (for small mobile devices) */
+@media only screen and (max-width: 600px) {
+    .ar-file-pdf {
+        font-size: 18px; /* Make PDF icon smaller for very small screens */
+    }
+
+    section.block.block_academic_reports.card.mb-3 {
+        height: auto; /* Allow the card to adjust height on small screens */
+    }
+
+    .my-custom-scrollbar {
+        height: 120px; /* Further reduce the scrollbar height */
+    }
+
+    .table-wrapper-scroll-y {
+        height: 12rem; /* Adjust the table height on small screens */
+    }
+
+    .ar-download-report-container {
+        padding: 5px; /* Reduce padding further on very small screens */
+        margin-left: 15rem;
+    }
+
+    .ar-download-all {
+        font-size: 12px; /* Further reduce font size for smaller screens */
+    }
+
+
+}

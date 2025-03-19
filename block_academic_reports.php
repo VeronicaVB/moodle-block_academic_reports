@@ -92,7 +92,7 @@ class block_academic_reports extends block_base
                 $data = academic_reports\get_template_context($profileuser->username, $USER->username);
             }
 
-            empty($data) ? $this->content->text = 'empty' : $this->content->text = $OUTPUT->render_from_template('block_academic_reports/main', $data);
+            empty($data) ? $this->content->text = '' : $this->content->text = $OUTPUT->render_from_template('block_academic_reports/main', $data);
         }
 
 
