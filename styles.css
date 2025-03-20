@@ -52,14 +52,25 @@ section.block.block_academic_reports.card.mb-3 {
 
 @media only screen and (max-width: 1024px) {
 
-    section.block.block_academic_reports.card.mb-3 {
+    /* section.block.block_academic_reports.card.mb-3 {
         width: 100%;
         position: relative;
         margin-left: 0;
         left: 0;
         top: 0 !important;
+    } */
+
+    section.block.block_academic_reports.card.mb-3 {
+        width: 100%; /* Full width for better usage of screen space */
+        height: auto; /* Allow the card to adjust height automatically */
+        margin-left: 0;
+        margin-right: 0;
     }
 
+     .ar-download-report-container {
+        padding: 5px; /* Reduce padding further on very small screens */
+        margin-left: 70%;
+    }
 }
 
 /* Media query for screens with a width of 600px or less (for small mobile devices) */
