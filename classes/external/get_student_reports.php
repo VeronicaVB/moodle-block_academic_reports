@@ -58,16 +58,25 @@ trait get_student_reports {
      */
     public static function get_student_reports($sequences) {
         global $USER, $PAGE;
-        
+
         $context = \context_user::instance($USER->id);
-       
+
         self::validate_context($context);
         //Parameters validation
         self::validate_parameters(self::get_student_reports_parameters(), array('sequences' => $sequences));
-        
-       
+
+        // Additional security check: only allow access from profile pages
+        if (!$PAGE->url || !$PAGE->url->get_param('id')) {
+            throw new \moodle_exception('nopermissions', 'error');
+        }
+
+        // Verify user can view reports on this profile
+        if (!\academic_reports\can_view_on_profile()) {
+            throw new \moodle_exception('nopermissions', 'error');
+        }
+
         $blobs = \academic_reports\get_student_reports_files($sequences);
-      
+
         return array(
             'blobs' => json_encode($blobs) //json_encode(base64_encode($blobs), JSON_UNESCAPED_UNICODE),
         );

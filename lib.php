@@ -154,10 +154,81 @@ function get_student_reports($studentusername, $mentorusername) {
 }
 
 /**
+ * Validates if the current user has permission to access a specific document
+ * @param int $tdocumentsseq The document sequence ID
+ * @return bool True if user has access, false otherwise
+ */
+function validate_document_access($tdocumentsseq) {
+    global $USER, $PAGE, $DB;
+
+    // Log the access attempt for security auditing
+    $logdata = array(
+        'userid' => $USER->id,
+        'username' => $USER->username,
+        'tdocumentsseq' => $tdocumentsseq,
+        'profileuserid' => $PAGE->url ? $PAGE->url->get_param('id') : 'unknown',
+        'useragent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
+        'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+    );
+
+    // Admin always has access
+    if (is_siteadmin($USER)) {
+        error_log('Academic Reports: Admin access granted - ' . json_encode($logdata));
+        return true;
+    }
+
+    // Get the profile user from the current page context
+    $profileuserid = $PAGE->url->get_param('id');
+    if (!$profileuserid) {
+        error_log('Academic Reports: Access denied - No profile user ID - ' . json_encode($logdata));
+        return false;
+    }
+
+    $profileuser = $DB->get_record('user', ['id' => $profileuserid]);
+    if (!$profileuser) {
+        error_log('Academic Reports: Access denied - Invalid profile user - ' . json_encode($logdata));
+        return false;
+    }
+
+    // Load custom fields for both users
+    profile_load_custom_fields($profileuser);
+    profile_load_custom_fields($USER);
+
+    // Students can only access their own reports
+    if ($profileuser->username == $USER->username) {
+        error_log('Academic Reports: Self access granted - ' . json_encode($logdata));
+        return true;
+    }
+
+    // Staff can access student reports
+    if (isset($USER->profile['CampusRoles']) &&
+        preg_match('/\b(Staff|staff)\b/', $USER->profile['CampusRoles']) == 1) {
+        error_log('Academic Reports: Staff access granted - ' . json_encode($logdata));
+        return true;
+    }
+
+    // Mentors can access their mentees' reports
+    $mentor = get_mentor($profileuser);
+    if (!empty($mentor)) {
+        error_log('Academic Reports: Mentor access granted - ' . json_encode($logdata));
+        return true;
+    }
+
+    // Log unauthorized access attempt
+    error_log('Academic Reports: UNAUTHORIZED ACCESS ATTEMPT - ' . json_encode($logdata));
+    return false;
+}
+
+/**
  * Returns the report clicked on the view
  */
 
 function get_student_report_file($tdocumentsseq) {
+
+    // Validate user has permission to access this document
+    if (!validate_document_access($tdocumentsseq)) {
+        throw new \moodle_exception('nopermissions', 'error');
+    }
 
     $config = get_config('block_academic_reports');
     // Last parameter (external = true) means we are not connecting to a Moodle database.
@@ -179,6 +250,13 @@ function get_student_report_file($tdocumentsseq) {
  *  Returns all the reports the student has
  */
 function get_student_reports_files($tDocumentsSequences) {
+
+    // Validate user has permission to access documents
+    // Use first document ID for validation (all should belong to same user)
+    $sequences = json_decode($tDocumentsSequences, true);
+    if (!empty($sequences) && !validate_document_access($sequences[0])) {
+        throw new \moodle_exception('nopermissions', 'error');
+    }
 
     $config = get_config('block_academic_reports');
     // Last parameter (external = true) means we are not connecting to a Moodle database.

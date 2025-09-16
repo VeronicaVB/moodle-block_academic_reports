@@ -48,7 +48,7 @@ trait get_student_report {
     public static  function get_student_report_parameters()    {
         return new external_function_parameters(
             array(
-                'tdocumentsseq' => new external_value(PARAM_RAW, 'file id to get'),               
+                'tdocumentsseq' => new external_value(PARAM_INT, 'file id to get'),
             )
         );
     }
@@ -58,16 +58,26 @@ trait get_student_report {
      */
     public static function get_student_report($tdocumentsseq) {
         global $USER, $PAGE;
-        
+
         $context = \context_user::instance($USER->id);
-       
+
         self::validate_context($context);
         //Parameters validation
         self::validate_parameters(self::get_student_report_parameters(), array('tdocumentsseq' => $tdocumentsseq));
-        
+
+        // Additional security check: only allow access from profile pages
+        if (!$PAGE->url || !$PAGE->url->get_param('id')) {
+            throw new \moodle_exception('nopermissions', 'error');
+        }
+
+        // Verify user can view reports on this profile
+        if (!\academic_reports\can_view_on_profile()) {
+            throw new \moodle_exception('nopermissions', 'error');
+        }
+
         // Get the context for the template.
         $blob = \academic_reports\get_student_report_file($tdocumentsseq);
-      
+
         return array(
             'blob' => json_encode(base64_encode($blob), JSON_UNESCAPED_UNICODE),
         );
