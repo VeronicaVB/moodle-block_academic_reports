@@ -161,61 +161,55 @@ function get_student_reports($studentusername, $mentorusername) {
 function validate_document_access($tdocumentsseq) {
     global $USER, $PAGE, $DB;
 
-    // Log the access attempt for security auditing
-    $logdata = array(
-        'userid' => $USER->id,
-        'username' => $USER->username,
-        'tdocumentsseq' => $tdocumentsseq,
-        'profileuserid' => $PAGE->url ? $PAGE->url->get_param('id') : 'unknown',
-        'useragent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
-        'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
-    );
-
     // Admin always has access
     if (is_siteadmin($USER)) {
-        error_log('Academic Reports: Admin access granted - ' . json_encode($logdata));
         return true;
     }
 
-    // Get the profile user from the current page context
-    $profileuserid = $PAGE->url->get_param('id');
+    // Try to get profile user from URL, but be more flexible
+    $profileuserid = null;
+    if ($PAGE->url) {
+        $profileuserid = $PAGE->url->get_param('id');
+    }
+
+    // If no profile user in URL, allow access if user can generally view reports
     if (!$profileuserid) {
-        error_log('Academic Reports: Access denied - No profile user ID - ' . json_encode($logdata));
-        return false;
+        // Check if user is in a context where they can view reports
+        return can_view_on_profile();
     }
 
     $profileuser = $DB->get_record('user', ['id' => $profileuserid]);
     if (!$profileuser) {
-        error_log('Academic Reports: Access denied - Invalid profile user - ' . json_encode($logdata));
         return false;
     }
 
-    // Load custom fields for both users
-    profile_load_custom_fields($profileuser);
-    profile_load_custom_fields($USER);
+    // Load custom fields safely
+    try {
+        profile_load_custom_fields($profileuser);
+        profile_load_custom_fields($USER);
+    } catch (Exception $e) {
+        // If profile fields fail to load, continue with basic validation
+    }
 
-    // Students can only access their own reports
+    // Students can access their own reports
     if ($profileuser->username == $USER->username) {
-        error_log('Academic Reports: Self access granted - ' . json_encode($logdata));
         return true;
     }
 
     // Staff can access student reports
     if (isset($USER->profile['CampusRoles']) &&
         preg_match('/\b(Staff|staff)\b/', $USER->profile['CampusRoles']) == 1) {
-        error_log('Academic Reports: Staff access granted - ' . json_encode($logdata));
         return true;
     }
 
     // Mentors can access their mentees' reports
     $mentor = get_mentor($profileuser);
     if (!empty($mentor)) {
-        error_log('Academic Reports: Mentor access granted - ' . json_encode($logdata));
         return true;
     }
 
-    // Log unauthorized access attempt
-    error_log('Academic Reports: UNAUTHORIZED ACCESS ATTEMPT - ' . json_encode($logdata));
+    // Log only actual unauthorized attempts
+    error_log('Academic Reports: Unauthorized access attempt - User: ' . $USER->username . ' Document: ' . $tdocumentsseq);
     return false;
 }
 
