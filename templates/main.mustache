@@ -26,9 +26,9 @@ along with Moodle. If not, see
     <div class="spinner-border text-primary ac-reports-working"  role="status"></div><br>
 </div>
      <div class = 'ar-download-report-container'>
-        <span><a href="#"  class = 'ar-download-all'>{{#str}} downloaalldreports, block_academic_reports {{/str}}</a>        
-     </div> 
-    
+        <span><a href="#"  class = 'ar-download-all' data-std = "{{studentid}}">{{#str}} downloaalldreports, block_academic_reports {{/str}}</a>
+     </div>
+
     <div class="card-body">
         <h3 class=" ar-title">{{#str}} pluginname, block_academic_reports {{/str}}</h3>
         <div class="container-fluid">
@@ -49,8 +49,8 @@ along with Moodle. If not, see
                                         {{#reports}}
                                         <tr >
                                             <td class="view-report">{{description}}</td>
-                                            <td class="text-center view-report"> 
-                                                <i data-tdss="{{tdocumentsseq}}"  class="fa fa-file-pdf-o ar-file-pdf" ></i>
+                                            <td class="text-center view-report">
+                                                <i data-tdss="{{tdocumentsseq}}" data-std = "{{studentid}}" class="fa fa-file-pdf-o ar-file-pdf" ></i>
                                             </td>
                                             <td>{{documentcreateddate}}</td>
                                         </tr>

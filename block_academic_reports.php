@@ -79,10 +79,6 @@ class block_academic_reports extends block_base
                 $data = academic_reports\get_template_context($profileuser->username, $profileuser->username);
             }
 
-            // Allow teachers to see the reports
-            if (preg_match('/\b(Staff|staff)\b/', $USER->profile['CampusRoles']) == 1 && $profileuser->username != $USER->username) {
-                $data = academic_reports\get_template_context($profileuser->username, $profileuser->username);
-            }
 
             $mentor = academic_reports\get_mentor($profileuser);
 

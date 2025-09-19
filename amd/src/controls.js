@@ -26,7 +26,7 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
     'block_academic_reports/FileSaver'],
     function ($, Ajax, Log, PubSub, JSZip, FileSaver) {
         'use strict';
-        // FileSaver is loaded and attached to the window object. It needs to be added in the arguments list but 
+        // FileSaver is loaded and attached to the window object. It needs to be added in the arguments list but
         // has to be accessed from the windows object
         function init() {
             var control = new Controls();
@@ -74,13 +74,15 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
 
             $('.view-report').on('click', function (event) {
                 const tdocumentsseq = ($(event.target).data()).tdss;
-                self.displayReportService(tdocumentsseq);
+                const std = ($(event.target).data()).std;
+                self.displayReportService(tdocumentsseq, std);
             });
 
             // Link to download reports
             $('.ar-download-all').on('click', function (event) {
                 // Get the sequence ids
                 var sequences = [];
+                var std = ($(event.target).data()).std;
 
                 document.querySelectorAll('[data-tdss]').forEach(el => {
                     sequences.push(el.getAttribute('data-tdss'));
@@ -91,7 +93,7 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
 
                 sequences = sequences.join(',')
                 sequences = `[${sequences}]`
-                self.getAllReportService(sequences)
+                self.getAllReportService(sequences, std);
                 event.preventDefault();
 
             });
@@ -99,12 +101,13 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
 
         };
 
-        Controls.prototype.displayReportService = function (tdocumentsseq) {
+        Controls.prototype.displayReportService = function (tdocumentsseq, std) {
             let self = this;
             Ajax.call([{
                 methodname: 'block_academic_reports_get_student_report',
                 args: {
-                    tdocumentsseq: tdocumentsseq
+                    tdocumentsseq: tdocumentsseq,
+                    std:std
                 },
 
                 done: function (response) {
@@ -121,13 +124,14 @@ define(['jquery', 'core/ajax', 'core/log', 'core/pubsub',
 
         };
 
-        Controls.prototype.getAllReportService = function (sequences) {
+        Controls.prototype.getAllReportService = function (sequences, std) {
             let self = this;
 
             Ajax.call([{
                 methodname: 'block_academic_reports_get_student_reports',
                 args: {
-                    sequences: sequences
+                    sequences: sequences,
+                    std:std
                 },
 
                 done: function (response) {

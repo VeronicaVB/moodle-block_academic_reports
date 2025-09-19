@@ -48,7 +48,8 @@ trait get_student_reports {
     public static  function get_student_reports_parameters()    {
         return new external_function_parameters(
             array(
-                'sequences' => new external_value(PARAM_RAW, 'file ids to get'),               
+                'sequences' => new external_value(PARAM_RAW, 'file ids to get'),
+                'std' => new external_value(PARAM_TEXT, 'student username')
             )
         );
     }
@@ -56,19 +57,19 @@ trait get_student_reports {
     /**
      * Return context.
      */
-    public static function get_student_reports($sequences) {
+    public static function get_student_reports($sequences, $std) {
         global $USER, $PAGE;
 
-        $context = \context_user::instance($USER->id);
+        // Require login for web service calls
+        require_login();
+
+        $context = \context_system::instance();
 
         self::validate_context($context);
         //Parameters validation
-        self::validate_parameters(self::get_student_reports_parameters(), array('sequences' => $sequences));
+        self::validate_parameters(self::get_student_reports_parameters(), array('sequences' => $sequences, 'std' => $std));
 
-        // Basic security check - the detailed validation is done in get_student_reports_files
-        // This allows for more flexible access while maintaining security
-
-        $blobs = \academic_reports\get_student_reports_files($sequences);
+        $blobs = \academic_reports\get_student_reports_files($sequences, $std);
 
         return array(
             'blobs' => json_encode($blobs) //json_encode(base64_encode($blobs), JSON_UNESCAPED_UNICODE),

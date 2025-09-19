@@ -24,5 +24,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_academic_reports';
-$plugin->version = 2023072200;
+$plugin->version = 2025091901;
 $plugin->requires = 2010112400;

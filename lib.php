@@ -43,9 +43,9 @@ function can_view_on_profile() {
             if (is_siteadmin($USER) && $profileuser->username != $USER->username) {
                 return true;
             }
-            // Staff allowed
+            // Staff not allowed
             if (preg_match('/\b(Staff|staff)\b/', $campusrole) == 1 && $profileuser->username != $USER->username) {
-                return true;
+                return false;
             }
 
             // Students are allowed to see block in their own profiles.
@@ -60,7 +60,7 @@ function can_view_on_profile() {
 
             }
 
-            // Allow teachers to see.
+
         }
     }
 
@@ -114,8 +114,11 @@ function get_template_context($studentusername, $mentorusername) {
         $repo->description = $report->description;
         $repo->documentcreateddate = (new  \DateTime($report->documentcreateddate))->format("d/m/Y");;
         $repo->tdocumentsseq = $report->tdocumentsseq;
+        $repo->studentid = $studentusername;
         $data['reports'][] = $repo;
     }
+
+    $data['studentid'] = $studentusername;
 
     return $data;
 }
@@ -154,62 +157,29 @@ function get_student_reports($studentusername, $mentorusername) {
 }
 
 /**
- * Validates if the current user has permission to access a specific document
- * @param int $tdocumentsseq The document sequence ID
- * @return bool True if user has access, false otherwise
+ * Validates if the current user can access reports for a specific student
+ * @param object $currentuser The current user
+ * @param object $studentuser The student whose reports are being accessed
+ * @return bool True if access is allowed, false otherwise
  */
-function validate_document_access($tdocumentsseq) {
-    global $USER, $PAGE, $DB;
-
-    // Admin always has access
-    if (is_siteadmin($USER)) {
+function can_user_access_student_reports($currentuser, $studentuser) {
+    // Admin can access all reports
+    if (is_siteadmin($currentuser)) {
         return true;
     }
 
-    // Try to get profile user from URL, but be more flexible
-    $profileuserid = null;
-    if ($PAGE->url) {
-        $profileuserid = $PAGE->url->get_param('id');
-    }
-
-    // If no profile user in URL, allow access if user can generally view reports
-    if (!$profileuserid) {
-        // Check if user is in a context where they can view reports
-        return can_view_on_profile();
-    }
-
-    $profileuser = $DB->get_record('user', ['id' => $profileuserid]);
-    if (!$profileuser) {
-        return false;
-    }
-
-    // Load custom fields safely
-    try {
-        profile_load_custom_fields($profileuser);
-        profile_load_custom_fields($USER);
-    } catch (Exception $e) {
-        // If profile fields fail to load, continue with basic validation
-    }
-
-    // Students can access their own reports
-    if ($profileuser->username == $USER->username) {
-        return true;
-    }
-
-    // Staff can access student reports
-    if (isset($USER->profile['CampusRoles']) &&
-        preg_match('/\b(Staff|staff)\b/', $USER->profile['CampusRoles']) == 1) {
+    // Student can only access their own reports
+    if ($currentuser->id == $studentuser->id) {
         return true;
     }
 
     // Mentors can access their mentees' reports
-    $mentor = get_mentor($profileuser);
+    $mentor = get_mentor($studentuser);
     if (!empty($mentor)) {
         return true;
     }
 
-    // Log only actual unauthorized attempts
-    error_log('Academic Reports: Unauthorized access attempt - User: ' . $USER->username . ' Document: ' . $tdocumentsseq);
+    // All other users denied
     return false;
 }
 
@@ -217,12 +187,26 @@ function validate_document_access($tdocumentsseq) {
  * Returns the report clicked on the view
  */
 
-function get_student_report_file($tdocumentsseq) {
+function get_student_report_file($tdocumentsseq, $std) {
+    global $USER, $DB;
 
-    // Validate user has permission to access this document
-    if (!validate_document_access($tdocumentsseq)) {
+    // Validate that the student username exists
+    $studentuser = $DB->get_record('user', ['username' => $std]);
+    if (!$studentuser) {
+        log_access_attempt($USER->id, $std, $tdocumentsseq, null, false, 'Invalid student username');
+        throw new \moodle_exception('invaliduserid', 'error');
+    }
+
+    // Validate that current user can access this student's reports
+    if (!can_user_access_student_reports($USER, $studentuser)) {
+        log_access_attempt($USER->id, $std, $tdocumentsseq, null, false, 'Access denied - insufficient permissions');
+        error_log('Academic Reports: Unauthorized access attempt - User: ' . $USER->username .
+                 ' tried to access document: ' . $tdocumentsseq . ' for student ID: ' . $std);
         throw new \moodle_exception('nopermissions', 'error');
     }
+
+    // Log successful access
+    log_access_attempt($USER->id, $std, $tdocumentsseq, null, true, 'Access granted');
 
     $config = get_config('block_academic_reports');
     // Last parameter (external = true) means we are not connecting to a Moodle database.
@@ -230,8 +214,8 @@ function get_student_report_file($tdocumentsseq) {
     // Connect to external DB.
     $externalDB->connect($config->dbhost, $config->dbuser, $config->dbpass, $config->dbname, '');
 
-    $sql = 'EXEC ' . $config->dbspsretrievestdreport . ' :tdocumentsseq';
-    $params = array('tdocumentsseq' => intval($tdocumentsseq));
+    $sql = 'EXEC ' . $config->dbspsretrievestdreport . ' :tdocumentsseq, :std';
+    $params = array('tdocumentsseq' => intval($tdocumentsseq), 'std' => intval($std));
 
 
     $documents = $externalDB->get_records_sql($sql, $params);
@@ -241,16 +225,58 @@ function get_student_report_file($tdocumentsseq) {
 }
 
 /**
+ * Log access attempts to the academic reports
+ * @param int $userid User ID attempting access
+ * @param string $studentusername Username of the student being accessed
+ * @param int|null $tdocumentsseq Document sequence if single document
+ * @param string|null $sequences Multiple document sequences if applicable
+ * @param bool $access_granted Whether access was granted or denied
+ * @param string|null $reason Reason for access denial or grant
+ */
+function log_access_attempt($userid, $studentusername, $tdocumentsseq = null, $sequences = null, $access_granted = false, $reason = null) {
+    global $DB;
+
+    $record = new \stdClass();
+    $record->userid = $userid;
+    $record->studentusername = $studentusername;
+    $record->tdocumentsseq = $tdocumentsseq;
+    $record->sequences = $sequences;
+    $record->access_granted = $access_granted ? 1 : 0;
+    $record->reason = $reason;
+    $record->ip_address = getremoteaddr();
+    $record->user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $record->timecreated = time();
+
+    try {
+        $DB->insert_record('block_academic_reports_log', $record);
+    } catch (\Exception $e) {
+        error_log('Failed to log access attempt: ' . $e->getMessage());
+    }
+}
+
+/**
  *  Returns all the reports the student has
  */
-function get_student_reports_files($tDocumentsSequences) {
+function get_student_reports_files($tDocumentsSequences, $std) {
+    global $USER, $DB;
 
-    // Validate user has permission to access documents
-    // Use first document ID for validation (all should belong to same user)
-    $sequences = json_decode($tDocumentsSequences, true);
-    if (!empty($sequences) && !validate_document_access($sequences[0])) {
+    // Validate that the student ID exists
+    $studentuser = $DB->get_record('user', ['username' => $std]); // id
+    if (!$studentuser) {
+        log_access_attempt($USER->id, $std, null, $tDocumentsSequences, false, 'Invalid student username');
+        throw new \moodle_exception('invaliduserid', 'error');
+    }
+
+    // Validate that current user can access this student's reports
+    if (!can_user_access_student_reports($USER, $studentuser)) {
+        log_access_attempt($USER->id, $std, null, $tDocumentsSequences, false, 'Access denied - insufficient permissions');
+        error_log('Academic Reports: Unauthorized access attempt - User: ' . $USER->username .
+                 ' tried to access multiple documents for student ID: ' . $std);
         throw new \moodle_exception('nopermissions', 'error');
     }
+
+    // Log successful access
+    log_access_attempt($USER->id, $std, null, $tDocumentsSequences, true, 'Access granted');
 
     $config = get_config('block_academic_reports');
     // Last parameter (external = true) means we are not connecting to a Moodle database.
@@ -258,9 +284,9 @@ function get_student_reports_files($tDocumentsSequences) {
     // Connect to external DB.
     $externalDB->connect($config->dbhost, $config->dbuser, $config->dbpass, $config->dbname, '');
 
-    $sql = 'EXEC ' . $config->dbspsretrievestdreports . ' :sequences';
+    $sql = 'EXEC ' . $config->dbspsretrievestdreports . ' :sequences, :std';
 
-    $params = array('sequences' => strval($tDocumentsSequences));
+    $params = array('sequences' => strval($tDocumentsSequences), 'std' => intval($std));
 
     $documents = $externalDB->get_records_sql($sql, $params);
     $documentsaux = [];

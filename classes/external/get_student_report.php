@@ -49,6 +49,7 @@ trait get_student_report {
         return new external_function_parameters(
             array(
                 'tdocumentsseq' => new external_value(PARAM_INT, 'file id to get'),
+                'std' => new external_value(PARAM_TEXT, 'student username')
             )
         );
     }
@@ -56,20 +57,20 @@ trait get_student_report {
     /**
      * Return context.
      */
-    public static function get_student_report($tdocumentsseq) {
+    public static function get_student_report($tdocumentsseq, $std) {
         global $USER, $PAGE;
 
-        $context = \context_user::instance($USER->id);
+        // Require login for web service calls
+        require_login();
+
+        $context = \context_system::instance();
 
         self::validate_context($context);
         //Parameters validation
-        self::validate_parameters(self::get_student_report_parameters(), array('tdocumentsseq' => $tdocumentsseq));
-
-        // Basic security check - the detailed validation is done in get_student_report_file
-        // This allows for more flexible access while maintaining security
+        self::validate_parameters(self::get_student_report_parameters(), array('tdocumentsseq' => $tdocumentsseq, 'std' => $std));
 
         // Get the context for the template.
-        $blob = \academic_reports\get_student_report_file($tdocumentsseq);
+        $blob = \academic_reports\get_student_report_file($tdocumentsseq, $std);
 
         return array(
             'blob' => json_encode(base64_encode($blob), JSON_UNESCAPED_UNICODE),

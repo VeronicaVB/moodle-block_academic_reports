@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/academic_reports/db" VERSION="20250119" COMMENT="XMLDB file for Moodle blocks/academic_reports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_academic_reports_log" COMMENT="Audit log for academic reports access attempts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User attempting access"/>
+        <FIELD NAME="studentusername" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Student username being accessed"/>
+        <FIELD NAME="tdocumentsseq" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Document sequence if single document"/>
+        <FIELD NAME="sequences" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Multiple document sequences if applicable"/>
+        <FIELD NAME="access_granted" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0" COMMENT="1 if access granted, 0 if denied"/>
+        <FIELD NAME="reason" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Reason for access denial or grant"/>
+        <FIELD NAME="ip_address" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" COMMENT="IP address of the request"/>
+        <FIELD NAME="user_agent" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="User agent string"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of the access attempt"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+
+    </TABLE>
+  </TABLES>
+</XMLDB>
