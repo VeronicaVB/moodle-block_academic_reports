@@ -270,8 +270,7 @@ function get_student_reports_files($tDocumentsSequences, $std) {
     // Validate that current user can access this student's reports
     if (!can_user_access_student_reports($USER, $studentuser)) {
         log_access_attempt($USER->id, $std, null, $tDocumentsSequences, false, 'Access denied - insufficient permissions');
-        error_log('Academic Reports: Unauthorized access attempt - User: ' . $USER->username .
-                 ' tried to access multiple documents for student ID: ' . $std);
+
         throw new \moodle_exception('nopermissions', 'error');
     }
 
